@@ -22,7 +22,7 @@ A bank api application written in Go for learning purposes. This project demonst
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/yourusername/bank-cli-learning-project.git
+   git clone https://github.com/yourusername/bank-api-learning-project.git
 
-    cd bank-cli-learning-project
+    cd bank-api-learning-project
     ```
