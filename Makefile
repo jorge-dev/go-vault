@@ -16,7 +16,7 @@ build: ## Build the Go project
 
 # Run the Go project
 run: build ## Build and run the Go project
-	@./.build/$(APP_NAME)
+	./.build/$(APP_NAME)
 
 # Start Docker containers using Docker Compose
 up: ## Start Docker containers
