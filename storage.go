@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 
 	_ "github.com/lib/pq"
@@ -54,7 +55,19 @@ func (s *PostgresStore) CreateAccountTable() error {
 }
 
 func (s *PostgresStore) GetAccountById(id int) (*Account, error) {
-	return nil, nil
+	query := `SELECT * FROM accounts WHERE id = $1`
+	rows, err := s.DB.Query(query, id)
+	if err != nil {
+		log.Println("Error getting account by id: from db", err)
+		return nil, err
+	}
+
+	for rows.Next() {
+		return scanIntoAccount(rows)
+	}
+
+	return nil, fmt.Errorf("Account %d not found", id)
+
 }
 
 func (s *PostgresStore) GetAccounts() ([]*Account, error) {
@@ -67,9 +80,8 @@ func (s *PostgresStore) GetAccounts() ([]*Account, error) {
 
 	accounts := make([]*Account, 0)
 	for rows.Next() {
-		account := &Account{}
-		if err := rows.Scan(&account.Id, &account.Name, &account.LastName, &account.Number, &account.Balance, &account.CreatedAt); err != nil {
-			log.Println("Error scanning account:", err)
+		account, err := scanIntoAccount(rows)
+		if err != nil {
 			return nil, err
 		}
 		accounts = append(accounts, account)
@@ -108,6 +120,33 @@ func (s *PostgresStore) UpdateAccount(account *Account) error {
 }
 
 func (s *PostgresStore) DeleteAccount(id int) error {
+	query := `DELETE FROM accounts WHERE id = $1`
+	res, err := s.DB.Exec(query, id)
+	if err != nil {
+		log.Println("Error deleting account:", err)
+		return err
+	}
 
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		log.Println("Error getting rows affected:", err)
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("Account %d not found", id)
+	}
+
+	log.Printf("Account %d deleted", id)
 	return nil
+
+}
+
+func scanIntoAccount(rows *sql.Rows) (*Account, error) {
+	account := &Account{}
+	if err := rows.Scan(&account.Id, &account.Name, &account.LastName, &account.Number, &account.Balance, &account.CreatedAt); err != nil {
+		log.Println("Error scanning account:", err)
+		return nil, err
+	}
+	return account, nil
 }
