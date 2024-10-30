@@ -1,21 +1,32 @@
 package main
 
-import "math/rand"
+import (
+	"time"
 
-type Account struct {
-	Id       int     `json:"id"`
-	Name     string  `json:"name"`
-	LastName string  `json:"last_name"`
-	Number   int64   `json:"number"`
-	Balance  float64 `json:"balance"`
+	"github.com/google/uuid"
+)
+
+type CreateAccountRequest struct {
+	FirstName string  `json:"first_name"`
+	LastName  string  `json:"last_name"`
+	Balance   float64 `json:"balance"`
 }
 
-func NewAccount(id int, name, lastName, number string, balance float64) *Account {
+type Account struct {
+	Id        int       `json:"id"`
+	Name      string    `json:"name"`
+	LastName  string    `json:"last_name"`
+	Number    uuid.UUID `json:"number"`
+	Balance   float64   `json:"balance"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+func NewAccount(name, lastName string, balance float64) *Account {
 	return &Account{
-		Id:       rand.Intn(1000),
-		Name:     name,
-		LastName: lastName,
-		Number:   rand.Int63n(1000000000000000),
-		Balance:  balance,
+		Name:      name,
+		LastName:  lastName,
+		Number:    uuid.New(),
+		Balance:   balance,
+		CreatedAt: time.Now().UTC(),
 	}
 }
