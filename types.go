@@ -21,6 +21,11 @@ type Account struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+type TransferRequest struct {
+	ToAccount uuid.UUID `json:"to_account"`
+	Amount    float64   `json:"amount"`
+}
+
 func NewAccount(name, lastName string, balance float64) *Account {
 	return &Account{
 		Name:      name,
